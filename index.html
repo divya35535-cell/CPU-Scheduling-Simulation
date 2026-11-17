@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPU Scheduling Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <button id="themeToggle" class="theme-toggle">
+    🌙 Dark Mode
+</button>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-icon">◫</div><div><strong>Schedulab</strong><small>CPU SCHEDULING LAB</small></div></div>
+      <div class="side-label">WORKSPACE</div>
+      <a class="nav active" href="#simulator">▦ <span>Simulator</span></a>
+      <a class="nav" href="#results">◷ <span>Results & Metrics</span></a>
+      <div class="side-note"><span class="pulse"></span> Simulation engine ready</div>
+      <div class="sidebar-bottom"><div class="avatar">CS</div><div><b>Computer Science</b><small>Operating Systems Project</small></div></div>
+    </aside>
+
+    <main class="main" id="simulator">
+      <header class="topbar">
+        <div><div class="eyebrow">OPERATING SYSTEMS / LAB</div><h1>CPU Scheduling Simulator</h1><p class="subtitle">Explore, compare, and understand CPU scheduling algorithms.</p></div>
+        <div class="top-status"><span class="pulse"></span> Ready to simulate</div>
+      </header>
+
+      <section class="intro-strip">
+        <div><div class="eyebrow light">INTERACTIVE LEARNING ENVIRONMENT</div><h2>Make every CPU cycle count.</h2><p>Configure processes, choose an algorithm, and visualize how your CPU handles the workload.</p></div>
+        <div class="cpu-art"><div class="chip"><span>CPU</span><small>CORE 01</small></div><i></i><i></i><i></i><i></i></div>
+      </section>
+
+      <div class="content-grid">
+        <section class="panel process-panel">
+          <div class="panel-heading"><div><span class="step">01</span><h3>Process configuration</h3><p>Add the processes you want the CPU to execute.</p></div><button class="ghost-btn" id="sampleBtn">↻ Load sample</button></div>
+          <div class="process-form">
+            <label>Process ID<input id="pid" type="text" value="P5" maxlength="8"></label>
+            <label>Arrival time<input id="arrival" type="number" min="0" value="0"></label>
+            <label>Burst time<input id="burst" type="number" min="1" value="5"></label>
+            <label>Priority <span class="optional">(lower = higher)</span><input id="priority" type="number" min="1" value="2"></label>
+            <button class="primary-btn add-btn" id="addBtn">＋ Add process</button>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>PROCESS</th><th>ARRIVAL</th><th>BURST</th><th>PRIORITY</th><th></th></tr></thead><tbody id="processRows"></tbody></table></div>
+          <div class="table-footer"><span id="processCount">0 processes added</span><button class="text-btn" id="clearBtn">Clear all</button></div>
+        </section>
+
+        <section class="panel settings-panel">
+          <div class="panel-heading"><div><span class="step">02</span><h3>Algorithm settings</h3><p>Select a scheduling strategy.</p></div></div>
+          <label class="field-label" for="algorithm">Scheduling algorithm</label>
+          <select id="algorithm">
+            <option value="fcfs">First Come First Served (FCFS)</option>
+            <option value="sjf">Shortest Job First (Non-preemptive)</option>
+            <option value="srtf">Shortest Remaining Time First (Preemptive)</option>
+            <option value="priority">Priority (Non-preemptive)</option>
+            <option value="priorityP">Priority (Preemptive)</option>
+            <option value="rr">Round Robin</option>
+          </select>
+          <div id="quantumWrap" class="quantum-wrap hidden"><label class="field-label" for="quantum">Time quantum</label><input id="quantum" type="number" min="1" value="2"></div>
+          <div class="algorithm-info" id="algorithmInfo"><b>FCFS</b><p>Processes execute in the order they arrive. Simple, but a long process can make others wait.</p></div>
+          <button class="primary-btn run-btn" id="runBtn">▶ Run simulation</button>
+          <p class="hint">Tip: Add at least one process before running the simulation.</p>
+        </section>
+        <select id="randomCount" class="input-field">
+    <option value="4">4 Processes</option>
+    <option value="5">5 Processes</option>
+    <option value="6" selected>6 Processes</option>
+    <option value="8">8 Processes</option>
+    <option value="10">10 Processes</option>
+</select>
+
+<button id="randomBtn" class="primary-btn">
+    🎲 Generate Random Workload
+</button>
+      </div>
+
+      <section class="panel results-panel" id="results">
+        <div class="panel-heading"><div><span class="step">03</span><h3>Simulation results</h3><p>Your execution timeline and performance metrics appear here.</p></div><button class="ghost-btn" id="exportBtn" disabled>⇩ Export CSV</button></div>
+        <div id="emptyState" class="empty-state"><div class="empty-icon">▤</div><b>No simulation yet</b><p>Configure your processes and run the simulation to see the Gantt chart and results.</p></div><button id="pdfBtn" class="primary-btn">
+    📄 Download PDF Report
+</button>
+        <div id="resultContent" class="hidden">
+          <!-- STARVATION DETECTION -->
+<section class="panel starvation-panel">
+    <h3>⚠️ Process Starvation Detection</h3>
+
+    <div id="starvationStatus">
+        Run simulation to analyze process starvation.
+    </div>
+
+    <div id="starvationResults"></div>
+</section>
+
+<div class="queue-panel">
+    <h3>Process Queue Monitor</h3>
+
+    <div class="queue-grid">
+        <div class="queue-card running">
+            <h4>🟢 Running</h4>
+            <div id="runningProcess">None</div>
+        </div>
+
+        <div class="queue-card waiting">
+            <h4>🟡 Ready Queue</h4>
+            <div id="waitingProcesses">None</div>
+        </div>
+
+        <div class="queue-card completed">
+            <h4>🔵 Completed</h4>
+            <div id="completedProcesses">None</div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<div class="context-panel">
+    <h3>⚡ Context Switching Monitor</h3>
+
+    <div class="context-grid">
+        <div>
+            <span>CONTEXT SWITCHES</span>
+            <strong id="contextSwitches">0</strong>
+        </div>
+
+        <div>
+            <span>SWITCH OVERHEAD</span>
+            <strong id="switchOverhead">0</strong>
+        </div>
+
+        <div>
+            <span>SWITCH RATE</span>
+            <strong id="switchRate">0%</strong>
+        </div>
+    </div>
+
+    <label for="switchCost">Context switch cost (time units)</label>
+    <input type="number" id="switchCost" min="0" step="0.1" value="0.2">
+</div>
+<div class="cpu-monitor">
+    <h3>CPU Performance Monitor</h3>
+
+    <div class="cpu-stats">
+        <div class="cpu-stat">
+            <span>CPU UTILIZATION</span>
+            <strong id="cpuUsage">0%</strong>
+            <div class="progress-track">
+                <div id="cpuUsageBar"></div>
+            </div>
+        </div>
+
+        <div class="cpu-stat">
+            <span>BUSY TIME</span>
+            <strong id="busyTime">0</strong>
+            <small>Time units</small>
+        </div>
+
+        <div class="cpu-stat">
+            <span>IDLE TIME</span>
+            <strong id="idleTime">0</strong>
+            <small>Time units</small>
+        </div>
+
+        <div class="cpu-stat">
+            <span>ELAPSED TIME</span>
+            <strong id="elapsedTime">0</strong>
+            <small>Time units</small>
+        </div>
+    </div>
+</div>
+
+          <div class="step-controls">
+    <button id="previousStep">⏮ Previous</button>
+    <button id="playSimulation">▶ Play</button>
+    <button id="pauseSimulation">⏸ Pause</button>
+    <button id="nextStep">Next ⏭</button>
+    <span id="stepCounter">Step 0</span>
+</div>
+
+
+          <div class="result-summary" id="resultSummary"></div>
+          <div class="chart-title"><b>CPU execution timeline</b><span>Time →</span></div>
+          <div class="gantt-scroll"><div class="gantt" id="gantt"></div><div class="timeline" id="timeline"></div></div>
+          <div class="metrics-grid" id="metrics"></div>
+          <div class="table-wrap result-table"><table><thead><tr><th>PROCESS</th><th>ARRIVAL</th><th>BURST</th><th>COMPLETION</th><th>TURNAROUND</th><th>WAITING</th><th>RESPONSE</th></tr></thead><tbody id="resultRows"></tbody></table></div>
+        </div>
+      </section>
+
+<section class="panel comparison-panel">
+    <div class="panel-heading">
+        <div>
+            <span class="step">04</span>
+            <h3>Algorithm Comparison</h3>
+            <p>Compare all scheduling algorithms using the same workload.</p>
+        </div>
+    </div>
+
+    <button id="compareBtn" class="primary-btn">
+        ⚡ Compare All Algorithms
+    </button>
+
+    <div id="comparisonResult" class="comparison-result">
+        <p>Run a comparison to see algorithm performance.</p>
+    </div>
+</section>
+
+      <footer>Schedulab · CPU Scheduling Simulator <span>Built for Operating Systems learning</span></footer>
+    </main>
+  </div>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
